@@ -1,3 +1,3 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-  com.gbi.hnapay.bean.result.enums.ErrorCodeProperties,\
-  com.gbi.hnapay.bean.result.enums.BankCodeProperties
+  wiki.ganhua.hnapay.bean.result.enums.ErrorCodeProperties,\
+  wiki.ganhua.hnapay.bean.result.enums.BankCodeProperties
