@@ -10,6 +10,7 @@
     <version>1.0.0</version>
     <name>OpenUtil-Tool - New Pay</name>
     <description>新生支付 Java SDK https://www.hnapay.com/</description>
+    <url>https://github.com/dingan-work/HnaPay-Java</url>
     <packaging>jar</packaging>
 
     <properties>
