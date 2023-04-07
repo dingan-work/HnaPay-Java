@@ -127,13 +127,18 @@ public class QueryAccountResult extends BaseResult {
 			String val = StrUtil.removeSuffix(StrUtil.removePrefix(value, "\""), "\"");
 			return Convert.convert(new TypeReference<T>() {}, JSON.parseArray(val,BindCardAgrNo.class));
 		}
+
+		@Override
+		public int getFastMatchToken() {
+			return 0;
+		}
 	}
 
 	@Override
 	public byte[] signContent() {
 		Map<String, Object> map = Maps.newLinkedHashMapWithExpectedSize(6);
 		map.put("userId", this.userId);
-		map.put("outUserId", this.outUserId);
+		map.put("outUserId", this.outUserId== null ? "" : this.outUserId);
 		map.put("userStat", this.userStat.getCode());
 		map.put("auditStat", this.auditStat.getCode());
 		map.put("balAmount", this.balAmount.toString());

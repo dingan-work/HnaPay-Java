@@ -3,6 +3,7 @@ package wiki.ganhua.hnapay.bean.request;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HttpUtil;
 import com.alibaba.fastjson.JSON;
@@ -60,6 +61,7 @@ public abstract class BaseHnaPayRequest implements Serializable {
         PARAMS_FILTER.getExcludes().addAll(FROM_PARAMS);
     }
 
+    @Getter(AccessLevel.NONE)
     private String url;
 
     /**
@@ -83,6 +85,7 @@ public abstract class BaseHnaPayRequest implements Serializable {
      * 商户订单号
      * 格式：数字，字母，下 划线，竖划线，中划线
      */
+    @Getter(AccessLevel.NONE)
     private String merOrderId;
 
     /**
@@ -206,6 +209,13 @@ public abstract class BaseHnaPayRequest implements Serializable {
         this.tranCode = tranCode;
     }
 
+    public String getUrl() {
+        if (StrUtil.isBlank(this.url)) {
+            return String.format("%s/%s.htm", HnaPayConfig.DEFAULT_PAY_BASE_URL, StrUtil.lowerFirst(this.getTranCode()));
+        }
+        return url;
+    }
+
     public String getMerUserIp(String merUserIp) {
         if (StrUtil.isBlank(merUserIp)) {
             // 默认网络获取
@@ -219,6 +229,13 @@ public abstract class BaseHnaPayRequest implements Serializable {
             this.merId = HnaPayConfigHolder.get();
         }
         return this.merId;
+    }
+
+    public String getMerOrderId() {
+        if (StrUtil.isBlank(this.merOrderId)) {
+            return StrUtil.concat(true, this.tranCode, IdUtil.getSnowflakeNextIdStr());
+        }
+        return this.merOrderId;
     }
 
     /**

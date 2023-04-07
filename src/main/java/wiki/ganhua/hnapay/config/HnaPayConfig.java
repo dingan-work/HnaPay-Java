@@ -13,7 +13,7 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode
 public class HnaPayConfig {
 
-	private static final String DEFAULT_PAY_BASE_URL = "https://ncount.hnapay.com/api/";
+	public static final String DEFAULT_PAY_BASE_URL = "https://ncount.hnapay.com/api/";
 
 	/**
 	 * 新生支付接口请求地址域名部分.
