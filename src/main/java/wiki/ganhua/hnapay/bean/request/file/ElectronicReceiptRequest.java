@@ -37,7 +37,9 @@ public class ElectronicReceiptRequest extends BaseHnaPayRequest {
     public void encryptBody(String publicKey) {
         Map<String, Object> map = Maps.newLinkedHashMapWithExpectedSize(3);
         map.put("ncountOrderId", this.ncountOrderId);
-        map.put("businessType", this.businessType.getType());
+        if (this.businessType != null) {
+            map.put("businessType", this.businessType.getType());
+        }
         map.put("orgTranCode", this.orgTranCode.name());
         super.encryptBody(map, publicKey);
     }

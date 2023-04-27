@@ -32,7 +32,6 @@ public class AccountManageServiceImpl extends BaseRequestImpl implements Account
 	public CardBindConfirmResult cardBindConfirm(String ncountOrderId, String smsCode) {
 		String url = String.format("%s/r008.htm", this.hnaPayService.getPayBaseUrl());
 		CardBindConfirmRequest request = new CardBindConfirmRequest();
-		request.setMerOrderId(IdUtil.getSnowflakeNextIdStr());
 		request.setNcountOrderId(ncountOrderId);
 		request.setSmsCode(smsCode);
 		request.setUrl(url);
@@ -44,7 +43,6 @@ public class AccountManageServiceImpl extends BaseRequestImpl implements Account
 	public boolean individualUserUnbinding(String oriBindCardAgrNo, String userId) {
 		String url = String.format("%s/r009.htm", this.hnaPayService.getPayBaseUrl());
 		CardUnbindingRequest request = new CardUnbindingRequest();
-		request.setMerOrderId(IdUtil.getSnowflakeNextIdStr());
 		request.setOriBindCardAgrNo(oriBindCardAgrNo);
 		request.setUserId(userId);
 		request.setUrl(url);

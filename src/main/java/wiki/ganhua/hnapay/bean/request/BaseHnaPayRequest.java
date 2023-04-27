@@ -3,6 +3,8 @@ package wiki.ganhua.hnapay.bean.request;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.lang.Validator;
+import cn.hutool.core.net.Ipv4Util;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HttpUtil;
@@ -18,10 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.TreeSet;
+import java.util.*;
 
 
 /**
@@ -55,10 +54,13 @@ public abstract class BaseHnaPayRequest implements Serializable {
 
     private static final SimplePropertyPreFilter PARAMS_FILTER = new SimplePropertyPreFilter();
 
+    private static final List<String> PUBLIC_URL = new ArrayList<>();
+
     static {
         FROM_PARAMS.addAll(ListUtil.of("url", "version", "tranCode",
                 "merId", "merOrderId", "submitTime", "msgCiphertext", "signType", "signValue", "merAttach", "charset"));
         PARAMS_FILTER.getExcludes().addAll(FROM_PARAMS);
+        PUBLIC_URL.addAll(Arrays.asList("https://ifconfig.me/ip", "https://api.ipify.org/", "https://checkip.amazonaws.com/"));
     }
 
     @Getter(AccessLevel.NONE)
@@ -133,7 +135,7 @@ public abstract class BaseHnaPayRequest implements Serializable {
         commonParams.put(VERSION, this.version);
         commonParams.put(TRAN_CODE, this.tranCode);
         commonParams.put(MER_ID, this.merId);
-        commonParams.put(MER_ORDER_ID, this.merOrderId);
+        commonParams.put(MER_ORDER_ID, this.getMerOrderId());
         commonParams.put(SUBMIT_TIME, this.submitTime);
         commonParams.put(MSG_CIPHER_TEXT, this.msgCiphertext);
         commonParams.put(SIGN_TYPE, this.signType);
@@ -149,7 +151,8 @@ public abstract class BaseHnaPayRequest implements Serializable {
     private void bodySign(String privateKey, String signatureKey) {
         String formatData = "version=[%s]tranCode=[%s]merId=[%s]merOrderId=[%s]submitTime=[%s]msgCiphertext=[%s]signType=[%s]";
         String bodyOriginalText = String.format(formatData, this.version, this.tranCode,
-                this.getMerId(), this.merOrderId, this.submitTime, this.msgCiphertext, this.signType);
+                this.getMerId(), this.getMerOrderId(), this.submitTime, this.msgCiphertext, this.signType);
+        System.out.println(bodyOriginalText);
         this.signValue = HnaPayRsaUtil.sign(bodyOriginalText.getBytes(StandardCharsets.UTF_8), privateKey, signatureKey);
     }
 
@@ -233,7 +236,7 @@ public abstract class BaseHnaPayRequest implements Serializable {
 
     public String getMerOrderId() {
         if (StrUtil.isBlank(this.merOrderId)) {
-            return StrUtil.concat(true, this.tranCode, IdUtil.getSnowflakeNextIdStr());
+            this.merOrderId = StrUtil.concat(true, this.tranCode, IdUtil.getSnowflakeNextIdStr());
         }
         return this.merOrderId;
     }
@@ -247,8 +250,23 @@ public abstract class BaseHnaPayRequest implements Serializable {
             ip = ip.replace("ipCallback(", "").replace(")", "");
             return JSON.parseObject(ip).getString("ip");
         } catch (Exception e) {
-            return HttpUtil.get("https://ifconfig.me/ip");
+            int size = PUBLIC_URL.size() - 1;
+            String ip = null;
+            do {
+                String url = PUBLIC_URL.get(size);
+                try {
+                    ip = removeExtraCharacters(HttpUtil.get(url));
+                } catch (Exception ignored) {
+                } finally {
+                    size--;
+                }
+            } while (!Validator.isIpv4(ip) && size >= 0);
+            return ip;
         }
+    }
+
+    protected static String removeExtraCharacters(String str) {
+        return str.replaceAll("[^\\d.]", "");
     }
 
 }

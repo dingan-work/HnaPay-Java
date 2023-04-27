@@ -97,6 +97,12 @@ public interface HnaPayService {
 	TransactionService getTransactionService();
 
 	/**
+	 * 文件下载相关服务
+	 * @return the file download manage service
+	 */
+	FileDownloadService getFileDownloadService();
+
+	/**
 	 * 解析快捷支付回调通知
 	 *
 	 * @param params 回调参数
